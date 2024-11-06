@@ -1,28 +1,13 @@
-import React, { useEffect } from 'react';
-import { Link, useNavigate } from 'react-router-dom';
+import React from 'react';
+import { Link } from 'react-router-dom';
 import * as DropdownMenu from '@radix-ui/react-dropdown-menu';
 
 const Navbar: React.FC = () => {
-  const navigate = useNavigate();
-
-  useEffect(() => {
-    const handleKeyPress = (event: KeyboardEvent) => {
-      if (event.ctrlKey && event.key === 'e') {
-        navigate('/bars');
-      }
-    };
-
-    window.addEventListener('keydown', handleKeyPress);
-    return () => {
-      window.removeEventListener('keydown', handleKeyPress);
-    };
-  }, [navigate]);
-
   return (
     <nav className="flex items-center justify-between bg-gray-800 p-4 shadow-md">
       {/* Logo Section */}
       <div className="text-white text-2xl font-bold">
-        <Link to="/">Booking Platform</Link>
+        <Link to="/">Muzak</Link>
       </div>
 
       {/* Desktop Navigation */}
@@ -44,7 +29,7 @@ const Navbar: React.FC = () => {
       {/* Mobile Navigation (Hamburger Menu) */}
       <div className="md:hidden">
         <DropdownMenu.Root>
-          <DropdownMenu.Trigger asChild>
+          <DropdownMenu.Trigger>
             <button className="text-white hover:bg-gray-700 p-2 rounded">
               ☰
             </button>

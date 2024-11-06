@@ -5,6 +5,7 @@ import Home from './pages/Home';
 import Artists from './pages/Artists';
 import Bars from './pages/Bars';
 import Reservations from './pages/Reservations';
+import LoginRegister from './pages/LoginRegister';
 
 const App: React.FC = () => {
   return (
@@ -15,6 +16,7 @@ const App: React.FC = () => {
         <Route path="/artists" element={<Artists />} />
         <Route path="/bars" element={<Bars />} />
         <Route path="/reservations" element={<Reservations />} />
+        <Route path="/login" element={<LoginRegister />} />
       </Routes>
     </Router>
   );
