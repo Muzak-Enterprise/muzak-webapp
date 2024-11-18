@@ -24,6 +24,9 @@ const Navbar: React.FC = () => {
         <Link to="/reservations">
           <button className="text-white hover:bg-gray-700 px-3 py-2 rounded">Reservations</button>
         </Link>
+        <Link to="/login">
+          <button className="text-white hover:bg-gray-700 px-3 py-2 rounded">Login</button>
+        </Link>
       </div>
 
       {/* Mobile Navigation (Hamburger Menu) */}
