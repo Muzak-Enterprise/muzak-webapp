@@ -1,6 +1,7 @@
 import React from 'react';
 import { Link } from 'react-router-dom';
 import * as DropdownMenu from '@radix-ui/react-dropdown-menu';
+import { HamburgerMenuIcon } from '@radix-ui/react-icons';
 
 const Navbar: React.FC = () => {
   return (
@@ -8,9 +9,9 @@ const Navbar: React.FC = () => {
      <div className="text-white text-2xl font-bold">
         <Link to="/">
           <img
-            src="MuzakLogo.webp"
+            src="MuzakLogo.png"
             alt="Muzak Logo"
-            className="h-16"
+            className="h-14 "
           />
         </Link>
       </div>
@@ -38,7 +39,7 @@ const Navbar: React.FC = () => {
         <DropdownMenu.Root>
           <DropdownMenu.Trigger>
             <button className="text-white hover:bg-gray-700 p-2 rounded">
-              ☰
+              <HamburgerMenuIcon className="h-6 w-6" />
             </button>
           </DropdownMenu.Trigger>
           <DropdownMenu.Content className="bg-gray-800 text-white rounded-md shadow-lg p-2">
