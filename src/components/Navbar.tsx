@@ -5,12 +5,16 @@ import * as DropdownMenu from '@radix-ui/react-dropdown-menu';
 const Navbar: React.FC = () => {
   return (
     <nav className="flex items-center justify-between bg-gray-800 p-4 shadow-md">
-      {/* Logo Section */}
-      <div className="text-white text-2xl font-bold">
-        <Link to="/">Muzak</Link>
+     <div className="text-white text-2xl font-bold">
+        <Link to="/">
+          <img
+            src="MuzakLogo.webp"
+            alt="Muzak Logo"
+            className="h-16"
+          />
+        </Link>
       </div>
 
-      {/* Desktop Navigation */}
       <div className="hidden md:flex space-x-6">
         <Link to="/">
           <button className="text-white hover:bg-gray-700 px-3 py-2 rounded">Home</button>
@@ -29,7 +33,7 @@ const Navbar: React.FC = () => {
         </Link>
       </div>
 
-      {/* Mobile Navigation (Hamburger Menu) */}
+      {/* Menu Burger*/}
       <div className="md:hidden">
         <DropdownMenu.Root>
           <DropdownMenu.Trigger>
