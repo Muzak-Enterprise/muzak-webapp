@@ -7,6 +7,7 @@ import Artists from "./pages/Artists";
 import Bars from "./pages/Bars";
 import Reservations from "./pages/Reservations";
 import LoginRegister from "./pages/LoginRegister";
+import EasterEgg from "./EasterEgg";
 
 const App: React.FC = () => {
   const location = useLocation();
@@ -14,6 +15,7 @@ const App: React.FC = () => {
 
   return (
     <>
+      <EasterEgg />
       {showNavbar && <Navbar />}{" "}
       <Routes>
         <Route path="/" element={<Home />} />

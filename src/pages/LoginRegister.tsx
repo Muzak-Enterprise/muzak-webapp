@@ -2,6 +2,7 @@ import React, { useState, ChangeEvent, FormEvent } from "react";
 import * as Tabs from "@radix-ui/react-tabs";
 import { EyeOpenIcon, EyeClosedIcon, HomeIcon } from "@radix-ui/react-icons";
 import { loginUser, registerUser, fetchInstruments } from "../apiService";
+import { useNavigate } from "react-router-dom";
 
 interface LoginData {
   email: string;
@@ -21,10 +22,9 @@ const passwordCriteria = {
   lowercase: /[a-z]/,
   uppercase: /[A-Z]/,
   number: /[0-9]/,
-  special: /[!@#$%^&*(),.?":{}|<>]/,
 };
 
-const validatePassword = (password: string) => {
+const validatePassword = (password: string): string[] => {
   const missingCriteria: string[] = [];
 
   if (password.length < passwordCriteria.minLength) {
@@ -39,11 +39,17 @@ const validatePassword = (password: string) => {
   if (!passwordCriteria.number.test(password)) {
     missingCriteria.push("au moins un chiffre");
   }
-  if (!passwordCriteria.special.test(password)) {
-    missingCriteria.push("au moins un caractère spécial (ex : @, #, $)");
-  }
 
   return missingCriteria;
+};
+
+const validateEmail = (email: string) => {
+  const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+  return emailRegex.test(email);
+};
+
+const validateName = (name: string) => {
+  return name.length >= 2;
 };
 
 const TabsDemo: React.FC = () => {
@@ -62,15 +68,20 @@ const TabsDemo: React.FC = () => {
     (LoginData | RegisterData)[]
   >([]);
 
+  const [passwordErrors, setPasswordErrors] = useState<string[]>([]);
+  const [emailError, setEmailError] = useState<string | null>(null);
+  const [nameError, setNameError] = useState<string | null>(null);
+
   const [loginError, setLoginError] = useState<string | null>(null);
   const [registerError, setRegisterError] = useState<string | null>(null);
-  const [passwordErrors, setPasswordErrors] = useState<string[]>([]);
 
   const [showLoginPassword, setShowLoginPassword] = useState(false);
   const [showRegisterPassword, setShowRegisterPassword] = useState(false);
   const [showConfirmPassword, setShowConfirmPassword] = useState(false);
 
   const [activeTab, setActiveTab] = useState("tab1");
+
+  const navigate = useNavigate();
 
   const handleLoginChange = (e: ChangeEvent<HTMLInputElement>) => {
     const { name, value } = e.target;
@@ -93,10 +104,16 @@ const TabsDemo: React.FC = () => {
 
     try {
       const response = await loginUser(loginData.email, loginData.password);
-      localStorage.setItem("authToken", response.token); 
+      localStorage.setItem(
+        "userName",
+        `${response.firstName} ${response.lastName}`
+      );
+      localStorage.setItem("authToken", response.token);
       console.log("Connexion réussie, token :", response.token);
       setLoginData({ email: "", password: "" });
       setLoginError(null);
+
+      navigate("/");
     } catch (error) {
       console.error("Erreur lors de la connexion :", error);
       setLoginError("Échec de la connexion. Vérifiez vos identifiants.");
@@ -105,6 +122,8 @@ const TabsDemo: React.FC = () => {
 
   const handleRegisterSubmit = async (e: FormEvent<HTMLFormElement>) => {
     e.preventDefault();
+    setEmailError(null);
+    setNameError(null);
     if (
       !registerData.firstName ||
       !registerData.lastName ||
@@ -116,7 +135,23 @@ const TabsDemo: React.FC = () => {
       return;
     }
 
+    if (
+      !validateName(registerData.firstName) ||
+      !validateName(registerData.lastName)
+    ) {
+      setNameError(
+        "Le prénom et le nom doivent contenir au moins 2 caractères."
+      );
+      return;
+    }
+
+    if (!validateEmail(registerData.email)) {
+      setEmailError("L'email n'est pas valide.");
+      return;
+    }
+
     const missingCriteria = validatePassword(registerData.password);
+
     if (missingCriteria.length > 0) {
       setPasswordErrors(missingCriteria);
       return;
@@ -137,7 +172,7 @@ const TabsDemo: React.FC = () => {
         registerData.password,
         registerData.passwordConfirmation
       );
-      localStorage.setItem("authToken", response.token); // Stockez le token
+      localStorage.setItem("authToken", response.token);
       console.log("Inscription réussie, token :", response.token);
       setRegisterData({
         firstName: "",
@@ -147,6 +182,7 @@ const TabsDemo: React.FC = () => {
         passwordConfirmation: "",
       });
       setRegisterError(null);
+      setActiveTab("tab1");
     } catch (error) {
       console.error("Erreur lors de l'inscription :", error);
       setRegisterError("Échec de l'inscription. Essayez de nouveau.");
@@ -224,25 +260,32 @@ const TabsDemo: React.FC = () => {
                     >
                       Mot de passe
                     </label>
-                    <input
-                      id="loginPassword"
-                      name="password"
-                      type={showLoginPassword ? "text" : "password"}
-                      value={loginData.password}
-                      onChange={handleLoginChange}
-                      className="w-full px-4 py-2 border rounded-md"
-                    />
-                    <button
-                      type="button"
-                      className="absolute right-2 top-2"
-                      onMouseDown={() => setShowLoginPassword(true)}
-                      onMouseUp={() => setShowLoginPassword(false)}
-                      onTouchStart={() => setShowLoginPassword(true)}
-                      onTouchEnd={() => setShowLoginPassword(false)}
-                    >
-                      {showLoginPassword ? <EyeClosedIcon /> : <EyeOpenIcon />}
-                    </button>
+                    <div className="relative">
+                      <input
+                        id="loginPassword"
+                        name="password"
+                        type={showLoginPassword ? "text" : "password"}
+                        value={loginData.password}
+                        onChange={handleLoginChange}
+                        className="w-full px-4 py-2 border rounded-md pr-10"
+                      />
+                      <button
+                        type="button"
+                        className="absolute right-3 top-1/2 transform -translate-y-1/2"
+                        onMouseDown={() => setShowLoginPassword(true)}
+                        onMouseUp={() => setShowLoginPassword(false)}
+                        onTouchStart={() => setShowLoginPassword(true)}
+                        onTouchEnd={() => setShowLoginPassword(false)}
+                      >
+                        {showLoginPassword ? (
+                          <EyeClosedIcon />
+                        ) : (
+                          <EyeOpenIcon />
+                        )}
+                      </button>
+                    </div>
                   </div>
+
                   {loginError && <p className="text-red-500">{loginError}</p>}
                   <button
                     type="submit"
@@ -264,7 +307,7 @@ const TabsDemo: React.FC = () => {
 
               <Tabs.Content value="tab2">
                 <h2 className="text-2xl font-bold mb-4 text-center">
-                  Crée ton compte Muzak !
+                  Créez votre compte Muzak !
                 </h2>
                 <form onSubmit={handleRegisterSubmit} className="space-y-4">
                   <div className="relative">
@@ -314,6 +357,9 @@ const TabsDemo: React.FC = () => {
                       onChange={handleRegisterChange}
                       className="w-full px-4 py-2 border rounded-md"
                     />
+                    {emailError && (
+                      <div className="text-red-500 text-sm">{emailError}</div>
+                    )}
                   </div>
                   <div className="relative">
                     <label
@@ -322,29 +368,32 @@ const TabsDemo: React.FC = () => {
                     >
                       Mot de passe
                     </label>
-                    <input
-                      id="registerPassword"
-                      name="password"
-                      type={showRegisterPassword ? "text" : "password"}
-                      value={registerData.password}
-                      onChange={handleRegisterChange}
-                      className="w-full px-4 py-2 border rounded-md"
-                    />
-                    <button
-                      type="button"
-                      className="absolute right-2 top-2"
-                      onMouseDown={() => setShowRegisterPassword(true)}
-                      onMouseUp={() => setShowRegisterPassword(false)}
-                      onTouchStart={() => setShowRegisterPassword(true)}
-                      onTouchEnd={() => setShowRegisterPassword(false)}
-                    >
-                      {showRegisterPassword ? (
-                        <EyeClosedIcon />
-                      ) : (
-                        <EyeOpenIcon />
-                      )}
-                    </button>
+                    <div className="relative">
+                      <input
+                        id="registerPassword"
+                        name="password"
+                        type={showRegisterPassword ? "text" : "password"}
+                        value={registerData.password}
+                        onChange={handleRegisterChange}
+                        className="w-full px-4 py-2 border rounded-md pr-10"
+                      />
+                      <button
+                        type="button"
+                        className="absolute right-3 top-1/2 transform -translate-y-1/2"
+                        onMouseDown={() => setShowRegisterPassword(true)}
+                        onMouseUp={() => setShowRegisterPassword(false)}
+                        onTouchStart={() => setShowRegisterPassword(true)}
+                        onTouchEnd={() => setShowRegisterPassword(false)}
+                      >
+                        {showRegisterPassword ? (
+                          <EyeClosedIcon />
+                        ) : (
+                          <EyeOpenIcon />
+                        )}
+                      </button>
+                    </div>
                   </div>
+
                   <div className="relative">
                     <label
                       className="block text-gray-600 mb-1"
@@ -352,35 +401,42 @@ const TabsDemo: React.FC = () => {
                     >
                       Confirmer le mot de passe
                     </label>
-                    <input
-                      id="passwordConfirmation"
-                      name="passwordConfirmation"
-                      type={showConfirmPassword ? "text" : "password"}
-                      value={registerData.passwordConfirmation}
-                      onChange={handleRegisterChange}
-                      className="w-full px-4 py-2 border rounded-md"
-                    />
-                    <button
-                      type="button"
-                      className="absolute right-2 top-2"
-                      onMouseDown={() => setShowConfirmPassword(true)}
-                      onMouseUp={() => setShowConfirmPassword(false)}
-                      onTouchStart={() => setShowConfirmPassword(true)}
-                      onTouchEnd={() => setShowConfirmPassword(false)}
-                    >
-                      {showConfirmPassword ? (
-                        <EyeClosedIcon />
-                      ) : (
-                        <EyeOpenIcon />
-                      )}
-                    </button>
+                    <div className="relative">
+                      <input
+                        id="passwordConfirmation"
+                        name="passwordConfirmation"
+                        type={showConfirmPassword ? "text" : "password"}
+                        value={registerData.passwordConfirmation}
+                        onChange={handleRegisterChange}
+                        className="w-full px-4 py-2 border rounded-md pr-10"
+                      />
+                      <button
+                        type="button"
+                        className="absolute right-3 top-1/2 transform -translate-y-1/2"
+                        onMouseDown={() => setShowConfirmPassword(true)}
+                        onMouseUp={() => setShowConfirmPassword(false)}
+                        onTouchStart={() => setShowConfirmPassword(true)}
+                        onTouchEnd={() => setShowConfirmPassword(false)}
+                      >
+                        {showConfirmPassword ? (
+                          <EyeClosedIcon />
+                        ) : (
+                          <EyeOpenIcon />
+                        )}
+                      </button>
+                    </div>
                   </div>
                   {passwordErrors.length > 0 && (
-                    <ul className="text-red-500">
+                    <div className="text-red-500 text-sm mt-1">
                       {passwordErrors.map((error, index) => (
-                        <li key={index}>{error}</li>
+                        <p key={index}>
+                          Le mot de passe doit contenir {error}.
+                        </p>
                       ))}
-                    </ul>
+                    </div>
+                  )}
+                  {nameError && (
+                    <div className="text-red-500 text-sm">{nameError}</div>
                   )}
                   {registerError && (
                     <p className="text-red-500">{registerError}</p>

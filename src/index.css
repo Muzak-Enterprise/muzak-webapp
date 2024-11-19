@@ -2,3 +2,10 @@
 @tailwind components;
 @tailwind utilities;
 
+@layer components {
+    .animate-grow {
+      @apply transform scale-0 opacity-0;
+      animation: grow 2s ease-in-out forwards;
+    }
+  }
+  

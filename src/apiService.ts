@@ -1,9 +1,7 @@
 import axios from "axios";
 
-// URL de base pour votre API
 const API_BASE_URL = "http://localhost:3002/api";
 
-// Création de l'instance Axios
 const apiClient = axios.create({
   baseURL: API_BASE_URL,
   headers: {
@@ -11,10 +9,9 @@ const apiClient = axios.create({
   },
 });
 
-// Intercepteur pour ajouter automatiquement le token aux requêtes
 apiClient.interceptors.request.use(
   (config) => {
-    const token = localStorage.getItem("authToken"); // Récupérer le token depuis le stockage local
+    const token = localStorage.getItem("authToken");
     if (token) {
       config.headers.Authorization = `Bearer ${token}`;
     }
@@ -25,7 +22,6 @@ apiClient.interceptors.request.use(
   }
 );
 
-// API: Connexion utilisateur
 export const loginUser = async (email: string, password: string) => {
   try {
     const response = await apiClient.post("/v1/auth/login", { email, password });
@@ -40,7 +36,6 @@ export const loginUser = async (email: string, password: string) => {
   }
 };
 
-// API: Inscription utilisateur
 export const registerUser = async (
   firstName: string,
   lastName: string,
@@ -56,18 +51,27 @@ export const registerUser = async (
       password,
       passwordConfirmation,
     });
-    // Optionnellement, tu peux directement connecter l'utilisateur après l'inscription
     if (response.data.token) {
       localStorage.setItem("authToken", response.data.token);
     }
-    return response.data; // Cela renverra des informations comme un message de succès ou le token
+    return response.data; 
   } catch (error) {
     console.error("Erreur lors de l'inscription :", error);
     throw error;
   }
 };
 
-// API: Récupération des instruments
+export const fetchUserDetails = async () => {
+  try {
+    const response = await apiClient.get("/v1/users/me");
+    return response.data;
+  } catch (error) {
+    console.error("Erreur lors de la récupération des détails utilisateur :", error);
+    throw error;
+  }
+};
+
+
 export const fetchInstruments = async () => {
   try {
     const response = await apiClient.get("/v1/instruments");
@@ -78,5 +82,4 @@ export const fetchInstruments = async () => {
   }
 };
 
-// Export par défaut pour `apiClient`, si nécessaire ailleurs
 export default apiClient;
