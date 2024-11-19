@@ -25,11 +25,10 @@ apiClient.interceptors.request.use(
 export const loginUser = async (email: string, password: string) => {
   try {
     const response = await apiClient.post("/v1/auth/login", { email, password });
-    // Stocker le token dans localStorage en cas de succès
     if (response.data.token) {
       localStorage.setItem("authToken", response.data.token);
     }
-    return response.data; // Cela renverra le token ou d'autres données liées à l'utilisateur
+    return response.data;
   } catch (error) {
     console.error("Erreur lors de la connexion :", error);
     throw error;
@@ -71,13 +70,43 @@ export const fetchUserDetails = async () => {
   }
 };
 
-
 export const fetchInstruments = async () => {
   try {
     const response = await apiClient.get("/v1/instruments");
     return response.data;
   } catch (error) {
     console.error("Erreur lors de la récupération des instruments :", error);
+    throw error;
+  }
+}
+
+export const fetchGenres = async () => {
+  try {
+    const response = await apiClient.get("/v1/genres");
+    return response.data;
+  } catch (error) {
+    console.error("Erreur lors de la récupération des genres :", error);
+    throw error;
+  }
+}
+
+export const fetchGroupDetails = async () => {
+  try {
+    const response = await apiClient.get(`/v1/groups`);
+    return response.data; 
+  } catch (error) {
+    console.error("Erreur lors de la récupération des détails du groupe :", error);
+    throw error;
+  }
+};
+
+export const fetchGroupById = async (id: string) => {
+  try {
+    const response = await apiClient.get(`/v1/groups/${id}`);
+    return response.data;
+    console.log(response.data);
+  } catch (error) {
+    console.error("Erreur lors de la récupération des détails du groupe :", error);
     throw error;
   }
 };

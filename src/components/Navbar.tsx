@@ -2,6 +2,7 @@ import React from "react";
 import { Link } from "react-router-dom";
 import * as DropdownMenu from "@radix-ui/react-dropdown-menu";
 import { HamburgerMenuIcon } from "@radix-ui/react-icons";
+import { FaceIcon } from "@radix-ui/react-icons";
 import { useEffect, useState } from "react";
 import { fetchUserDetails } from "../apiService";
 
@@ -11,9 +12,9 @@ const Navbar: React.FC = () => {
   useEffect(() => {
     const fetchUser = async () => {
       try {
-        const userDetails = await fetchUserDetails(); 
+        const userDetails = await fetchUserDetails();
         if (userDetails && userDetails.firstName) {
-          setFirstName(userDetails.firstName); 
+          setFirstName(userDetails.firstName);
         }
       } catch (error) {
         console.error(
@@ -47,14 +48,9 @@ const Navbar: React.FC = () => {
             Home
           </button>
         </Link>
-        <Link to="/artists">
+        <Link to="/groups">
           <button className="text-white hover:bg-gray-700 px-3 py-2 rounded">
-            Artists
-          </button>
-        </Link>
-        <Link to="/bars">
-          <button className="text-white hover:bg-gray-700 px-3 py-2 rounded">
-            Bars
+            Groups
           </button>
         </Link>
         <Link to="/reservations">
@@ -64,7 +60,13 @@ const Navbar: React.FC = () => {
         </Link>
         {firstName ? (
           <div className="flex items-center space-x-4">
-            <span className="text-white">Bienvenue, {firstName}!</span>
+            <Link to="/profile">
+              <button className="flex items-center text-white hover:bg-gray-700 px-3 py-2 rounded">
+                <FaceIcon className="mr-2" />
+                {firstName}
+              </button>
+            </Link>
+
             <button
               onClick={handleLogout}
               className="text-white hover:bg-red-600 px-3 py-2 rounded bg-red-500"
@@ -81,7 +83,7 @@ const Navbar: React.FC = () => {
         )}
       </div>
 
-      {/* Menu Burger*/}
+      {/* Menu Burger */}
       <div className="md:hidden">
         <DropdownMenu.Root>
           <DropdownMenu.Trigger>
@@ -100,18 +102,10 @@ const Navbar: React.FC = () => {
             </DropdownMenu.Item>
             <DropdownMenu.Item>
               <Link
-                to="/artists"
+                to="/groups"
                 className="block px-4 py-2 hover:bg-gray-700 rounded"
               >
-                Artists
-              </Link>
-            </DropdownMenu.Item>
-            <DropdownMenu.Item>
-              <Link
-                to="/bars"
-                className="block px-4 py-2 hover:bg-gray-700 rounded"
-              >
-                Bars
+                Groups
               </Link>
             </DropdownMenu.Item>
             <DropdownMenu.Item>
@@ -128,6 +122,14 @@ const Navbar: React.FC = () => {
                   <span className="block px-4 py-2 rounded">
                     Bienvenue, {firstName}
                   </span>
+                </DropdownMenu.Item>
+                <DropdownMenu.Item>
+                  <Link
+                    to="/profile"
+                    className="block w-full text-left px-4 py-2 hover:bg-gray-700 rounded"
+                  >
+                    Profil
+                  </Link>
                 </DropdownMenu.Item>
                 <DropdownMenu.Item>
                   <button

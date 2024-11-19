@@ -2,9 +2,9 @@ import React from "react";
 import { Route, Routes, useLocation } from "react-router-dom";
 import Navbar from "./components/Navbar";
 import Home from "./pages/Home";
-import ArtistList from "./components/ArtistList";
-import Artists from "./pages/Artists";
-import Bars from "./pages/Bars";
+import GroupsList from "./components/GroupsList";
+import Groups from "./pages/Groups";
+// import Bars from "./pages/Bars";
 import Reservations from "./pages/Reservations";
 import LoginRegister from "./pages/LoginRegister";
 import EasterEgg from "./EasterEgg";
@@ -19,9 +19,9 @@ const App: React.FC = () => {
       {showNavbar && <Navbar />}{" "}
       <Routes>
         <Route path="/" element={<Home />} />
-        <Route path="/artists" element={<ArtistList />} />
-        <Route path="/artists/:id" element={<Artists />} />
-        <Route path="/bars" element={<Bars />} />
+        <Route path="/groups" element={<GroupsList />} />
+        <Route path="/groups/:id" element={<Groups />} />
+        {/* <Route path="/bars" element={<Bars />} /> */}
         <Route path="/reservations" element={<Reservations />} />
         <Route path="/login" element={<LoginRegister />} />
       </Routes>

@@ -11,19 +11,16 @@ const EasterEgg: React.FC = () => {
     const handleKeyPress = (event: KeyboardEvent) => {
       currentInput.push(event.key);
 
-      // Si la séquence correspond à "macron"
       if (currentInput.join("") === keySequence) {
-        setShowImage(true); // Affiche l'image
-        audio.play(); // Joue le son
-        currentInput = []; // Réinitialise la séquence de touches
+        setShowImage(true);
+        audio.play(); 
+        currentInput = [];
 
-        // Masque l'image après 2 secondes (ou la durée de ton choix)
         setTimeout(() => {
           setShowImage(false);
-        }, 2000); // Disparition après 2 secondes
+        }, 2000); 
       }
 
-      // Si la séquence dépasse la longueur de "macron", réinitialise
       if (currentInput.length >= keySequence.length) {
         currentInput = [];
       }

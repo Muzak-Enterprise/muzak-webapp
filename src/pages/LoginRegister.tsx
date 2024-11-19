@@ -1,7 +1,7 @@
 import React, { useState, ChangeEvent, FormEvent } from "react";
 import * as Tabs from "@radix-ui/react-tabs";
 import { EyeOpenIcon, EyeClosedIcon, HomeIcon } from "@radix-ui/react-icons";
-import { loginUser, registerUser, fetchInstruments } from "../apiService";
+import { loginUser, registerUser } from "../apiService";
 import { useNavigate } from "react-router-dom";
 
 interface LoginData {
@@ -104,10 +104,6 @@ const TabsDemo: React.FC = () => {
 
     try {
       const response = await loginUser(loginData.email, loginData.password);
-      localStorage.setItem(
-        "userName",
-        `${response.firstName} ${response.lastName}`
-      );
       localStorage.setItem("authToken", response.token);
       console.log("Connexion réussie, token :", response.token);
       setLoginData({ email: "", password: "" });
