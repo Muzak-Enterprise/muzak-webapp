@@ -103,12 +103,58 @@ export const fetchGroupDetails = async () => {
 export const fetchGroupById = async (id: string) => {
   try {
     const response = await apiClient.get(`/v1/groups/${id}`);
-    return response.data;
     console.log(response.data);
+    return response.data;
   } catch (error) {
     console.error("Erreur lors de la récupération des détails du groupe :", error);
     throw error;
   }
 };
 
+
+export const updateUser = async (userId: number, updatedData: any) => {
+  const apiUrl = `https://votre-api.com/users/${userId}`;
+
+  try {
+    const response = await fetch(apiUrl, {
+      method: "PATCH",
+      headers: {
+        "Content-Type": "application/json",
+        // Assurez-vous d'ajouter un jeton d'authentification si nécessaire
+        // "Authorization": `Bearer ${yourAuthToken}`,
+      },
+      body: JSON.stringify(updatedData),
+    });
+
+    if (!response.ok) {
+      throw new Error("Erreur lors de la mise à jour de l'utilisateur.");
+    }
+
+    const data = await response.json();
+    return data; // Retourne les données mises à jour de l'utilisateur
+  } catch (error) {
+    console.error("Erreur de mise à jour utilisateur", error);
+  }
+};
+
+
 export default apiClient;
+
+
+// export const fetchUserReservations = async () => {
+//   try {
+//     const response = await apiClient.get("/v1/reservations");
+//     return response.data.map((reservation: any) => ({
+//       groupId: reservation.groupId,
+//       groupName: reservation.groupName,
+//       reservationDate: reservation.date,
+//       members: reservation.members.map((member: any) => ({
+//         id: member.id,
+//         name: `${member.firstName} ${member.lastName}`,
+//       })),
+//     }));
+//   } catch (error) {
+//     console.error("Erreur lors de la récupération des réservations :", error);
+//     throw error;
+//   }
+// };

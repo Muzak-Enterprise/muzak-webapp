@@ -1,35 +1,53 @@
 import React, { useState, useEffect } from "react";
 import { Link } from "react-router-dom";
 import { ChevronUpIcon, ChevronDownIcon } from "@radix-ui/react-icons";
-import { fetchGroupDetails, fetchInstruments, fetchGenres } from "../apiService";
+import { fetchGroupDetails } from "../apiService";
+import Badge from "./Badge"; // Assurez-vous que le composant Badge est bien importé
 
 interface GroupInstrument {
   instrumentId: number;
+  instrument: {
+    id: number;
+    instrument: string;
+  };
 }
 
 interface GroupGenre {
   genreId: number;
+  genre: {
+    id: number;
+    genre: string;
+  };
 }
 
 interface Group {
   id: number;
   name: string;
   createdAt: string;
-  imageUrl?: string;
   groupInstruments: GroupInstrument[];
   groupGenres: GroupGenre[];
+  userGroups: UserGroup[];
 }
 
-interface Instrument {
+interface UserGroup {
+  groupId: number;
+  user: {
+    id: number;
+    firstName: string;
+    lastName: string;
+  };
+}
+
+interface FilteredInstrument {
   id: number;
   instrument: string;
-  count ?: number;
+  count: number;
 }
 
-interface Genre {
+interface FilteredGenre {
   id: number;
   genre: string;
-  count ?: number;
+  count: number;
 }
 
 const GroupsList: React.FC = () => {
@@ -37,16 +55,13 @@ const GroupsList: React.FC = () => {
   const [sortOrder, setSortOrder] = useState<"name" | "createdAt">("name");
   const [ascending, setAscending] = useState<boolean>(true);
 
-  const [instruments, setInstruments] = useState<Instrument[]>([]);
-  const [filteredInstruments, setFilteredInstruments] = useState<Instrument[]>([]);
+  const [filteredInstruments, setFilteredInstruments] = useState<FilteredInstrument[]>([]);
   const [selectedInstruments, setSelectedInstruments] = useState<number[]>([]);
-  
-  const [genres, setGenres] = useState<Genre[]>([]);
-  const [filteredGenres, setFilteredGenres] = useState<Genre[]>([]);
+
+  const [filteredGenres, setFilteredGenres] = useState<FilteredGenre[]>([]);
   const [selectedGenres, setSelectedGenres] = useState<number[]>([]);
 
-  console.log(filteredGenres);
-  console.log(filteredInstruments);
+  const [searchQuery, setSearchQuery] = useState<string>(""); // État pour la barre de recherche
 
   useEffect(() => {
     const getGroups = async () => {
@@ -61,86 +76,79 @@ const GroupsList: React.FC = () => {
     getGroups();
   }, []);
 
-  useEffect(() => {
-    const getInstruments = async () => {
-      try {
-        const fetchedInstruments = await fetchInstruments();
-        setInstruments(fetchedInstruments);
-      } catch (error) {
-        console.error("Erreur lors de la récupération des instruments:", error);
-      }
-    };
-
-    getInstruments();
-  }, []);
-
-  useEffect(() => {
-    const getGenres = async () => {
-      try {
-        const fetchedGenres = await fetchGenres();
-        setGenres(fetchedGenres);
-      } catch (error) {
-        console.error("Erreur lors de la récupération des genres:", error);
-      }
-    };
-
-    getGenres();
-  }, []);
-
-  useEffect(() => {
-    const instrumentCounts = groups.reduce((counts, group) => {
+  // Mettre à jour les données filtrées (instruments et genres)
+  const updateFilteredData = (filteredGroups: Group[]) => {
+    const instrumentCounts = filteredGroups.reduce((counts, group) => {
       group.groupInstruments.forEach((gi) => {
-        counts[gi.instrumentId] = (counts[gi.instrumentId] || 0) + 1;
+        counts[gi.instrument.id] = (counts[gi.instrument.id] || 0) + 1;
       });
       return counts;
     }, {} as Record<number, number>);
 
-    const filtered = instruments
-      .filter((instrument) => instrumentCounts[instrument.id]) 
-      .map((instrument) => ({
-        ...instrument,
-        count: instrumentCounts[instrument.id] || 0,
-      }));
+    const updatedInstruments = filteredGroups.flatMap((group) =>
+      group.groupInstruments.map((gi) => ({
+        id: gi.instrument.id,
+        instrument: gi.instrument.instrument,
+        count: instrumentCounts[gi.instrument.id] || 0,
+      }))
+    );
 
-    setFilteredInstruments(filtered);
-  }, [groups, instruments]);
+    const uniqueInstruments = Array.from(
+      new Map(updatedInstruments.map((item) => [item.id, item])).values()
+    );
 
-  useEffect(() => {
-    const genreCounts = groups.reduce((counts, group) => {
+    setFilteredInstruments(uniqueInstruments);
+
+    const genreCounts = filteredGroups.reduce((counts, group) => {
       group.groupGenres.forEach((genre) => {
-        counts[genre.genreId] = (counts[genre.genreId] || 0) + 1;
+        counts[genre.genre.id] = (counts[genre.genre.id] || 0) + 1;
       });
       return counts;
     }, {} as Record<number, number>);
 
-    const filtered = genres
-      .filter((genre) => genreCounts[genre.id])
-      .map((genre) => ({
-        ...genre,
-        count: genreCounts[genre.id] || 0, 
-      }));
+    const updatedGenres = filteredGroups.flatMap((group) =>
+      group.groupGenres.map((genre) => ({
+        id: genre.genre.id,
+        genre: genre.genre.genre,
+        count: genreCounts[genre.genre.id] || 0,
+      }))
+    );
 
-    setFilteredGenres(filtered);
-  }, [groups, genres]);
+    const uniqueGenres = Array.from(
+      new Map(updatedGenres.map((item) => [item.id, item])).values()
+    );
 
+    setFilteredGenres(uniqueGenres);
+  };
+
+  // Filtrer les groupes
   const filteredGroups = groups.filter((group) => {
     if (selectedInstruments.length > 0) {
-      const groupInstrumentIds = group.groupInstruments.map((gi) => gi.instrumentId);
+      const groupInstrumentIds = group.groupInstruments.map((gi) => gi.instrument.id);
       if (!selectedInstruments.every((id) => groupInstrumentIds.includes(id))) {
         return false;
       }
     }
 
     if (selectedGenres.length > 0) {
-      const groupGenreIds = group.groupGenres.map((gi) => gi.genreId);
+      const groupGenreIds = group.groupGenres.map((gi) => gi.genre.id);
       if (!selectedGenres.every((id) => groupGenreIds.includes(id))) {
         return false;
       }
     }
 
+    if (searchQuery.trim()) {
+      return group.name.toLowerCase().includes(searchQuery.toLowerCase());
+    }
+
     return true;
   });
 
+  useEffect(() => {
+    updateFilteredData(filteredGroups);
+  }, [groups, selectedInstruments, selectedGenres, searchQuery]);
+
+  // Tri des groupes
   const sortedGroups = [...filteredGroups].sort((a, b) => {
     if (sortOrder === "name") {
       return ascending
@@ -166,17 +174,13 @@ const GroupsList: React.FC = () => {
 
   const handleInstrumentFilterChange = (instrumentId: number) => {
     setSelectedInstruments((prev) =>
-      prev.includes(instrumentId)
-        ? prev.filter((id) => id !== instrumentId)
-        : [...prev, instrumentId]
+      prev.includes(instrumentId) ? prev.filter((id) => id !== instrumentId) : [...prev, instrumentId]
     );
   };
 
   const handleGenreFilterChange = (genreId: number) => {
     setSelectedGenres((prev) =>
-      prev.includes(genreId)
-        ? prev.filter((id) => id !== genreId)
-        : [...prev, genreId]
+      prev.includes(genreId) ? prev.filter((id) => id !== genreId) : [...prev, genreId]
     );
   };
 
@@ -219,21 +223,29 @@ const GroupsList: React.FC = () => {
               <ChevronDownIcon className="inline-block" />
             ))}
         </button>
+        <input
+          type="text"
+          placeholder="Rechercher un groupe"
+          value={searchQuery}
+          onChange={(e) => setSearchQuery(e.target.value)}
+          className="flex-grow px-4 py-2 border border-gray-300 rounded-lg"
+        />
       </div>
 
       <div className="mb-6">
         <h2 className="text-lg font-medium mb-4">Filtrer par instruments :</h2>
         <div className="flex flex-wrap gap-4">
           {filteredInstruments.map((instrument) => (
-            <label key={instrument.id} className="flex items-center gap-2">
-              <input
-                type="checkbox"
-                checked={selectedInstruments.includes(instrument.id)}
-                onChange={() => handleInstrumentFilterChange(instrument.id)}
-                className="w-4 h-4"
-              />
-              {instrument.instrument} ({instrument.count})
-            </label>
+            <Badge
+              key={instrument.id}
+              text={`${instrument.instrument} (${instrument.count})`}
+              color={
+                selectedInstruments.includes(instrument.id)
+                  ? "bg-blue-500 hover:bg-blue-600 cursor-pointer"
+                  : "bg-gray-300 hover:bg-gray-400 cursor-pointer"
+              }
+              onClick={() => handleInstrumentFilterChange(instrument.id)}
+            />
           ))}
         </div>
       </div>
@@ -242,43 +254,40 @@ const GroupsList: React.FC = () => {
         <h2 className="text-lg font-medium mb-4">Filtrer par genres :</h2>
         <div className="flex flex-wrap gap-4">
           {filteredGenres.map((genre) => (
-            <label key={genre.id} className="flex items-center gap-2">
-              <input
-                type="checkbox"
-                checked={selectedGenres.includes(genre.id)}
-                onChange={() => handleGenreFilterChange(genre.id)}
-                className="w-4 h-4"
-              />
-              {genre.genre} ({genre.count})
-            </label>
+            <Badge
+              key={genre.id}
+              text={`${genre.genre} (${genre.count})`}
+              color={
+                selectedGenres.includes(genre.id)
+                  ? "bg-green-500 hover:bg-green-600 cursor-pointer"
+                  : "bg-gray-300 hover:bg-gray-400 cursor-pointer"
+              }
+              onClick={() => handleGenreFilterChange(genre.id)}
+            />
           ))}
         </div>
       </div>
 
-      <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6">
+      <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-8">
         {sortedGroups.map((group) => (
           <Link
             to={`/groups/${group.id}`}
             key={group.id}
-            className="block bg-white border border-gray-200 rounded-lg overflow-hidden shadow-md hover:shadow-lg transition-shadow duration-300"
+            className="block p-6 bg-white rounded-lg shadow-md hover:bg-gray-100"
           >
-            <img
-              src={group.imageUrl || "https://via.placeholder.com/150"}
-              alt={group.name}
-              className="w-full h-48 object-cover"
-            />
-            <div className="p-4">
-              <h2 className="text-xl font-semibold text-gray-800">{group.name}</h2>
-              <p className="text-gray-500 text-sm">
-                Créé le : {new Date(group.createdAt).toLocaleDateString()}
-              </p>
-              <p className="text-gray-500 text-sm">
-                Instruments associés : {group.groupInstruments?.length || 0}
-              </p>
-              <p className="text-gray-500 text-sm">
-                Genres associés : {group.groupGenres?.length || 0}
-              </p>
-            </div>
+            <h3 className="text-xl font-semibold mb-2">{group.name}</h3>
+            <p className="text-sm text-gray-600">
+              Créé le : {new Date(group.createdAt).toLocaleDateString()}
+            </p>
+            <p className="text-sm text-gray-600">
+              Membres :{" "}
+              {group.userGroups
+                .map(
+                  (userGroup) =>
+                    `${userGroup.user.firstName.toUpperCase()} ${userGroup.user.lastName}`
+                )
+                .join(", ")}
+            </p>
           </Link>
         ))}
       </div>
