@@ -111,6 +111,15 @@ export const fetchGroupById = async (id: string) => {
   }
 };
 
+export const createGroup = async (group: any) => {
+  try {
+    const response = await apiClient.post("/v1/groups", group);
+    return response.data;
+  } catch (error) {
+    console.error("Erreur lors de la création du groupe :", error);
+    throw error;
+  }
+};
 
 export const updateUser = async (userId: number, updatedData: any) => {
   const apiUrl = `https://votre-api.com/users/${userId}`;
@@ -120,8 +129,6 @@ export const updateUser = async (userId: number, updatedData: any) => {
       method: "PATCH",
       headers: {
         "Content-Type": "application/json",
-        // Assurez-vous d'ajouter un jeton d'authentification si nécessaire
-        // "Authorization": `Bearer ${yourAuthToken}`,
       },
       body: JSON.stringify(updatedData),
     });
@@ -137,24 +144,35 @@ export const updateUser = async (userId: number, updatedData: any) => {
   }
 };
 
+export const createAddress = async (address: any) => {
+  try {
+    const response = await apiClient.post("/v1/addresses", address);
+    return response.data;
+  } catch (error) {
+    console.error("Erreur lors de la création de l'adresse :", error);
+    throw error;
+  }
+};
+
+export const fetchAddresses = async () => {
+  try {
+    const response = await apiClient.get("/v1/addresses");
+    return response.data;
+  } catch (error) {
+    console.error("Erreur lors de la récupération des adresses :", error);
+    throw error;
+  }
+};
+
+
+export const createReservation = async (reservation: any) => {
+  try {
+    const response = await apiClient.post("/v1/reservations", reservation);
+    return response.data;
+  } catch (error) {
+    console.error("Erreur lors de la création de la réservation :", error);
+    throw error;
+  }
+};
 
 export default apiClient;
-
-
-// export const fetchUserReservations = async () => {
-//   try {
-//     const response = await apiClient.get("/v1/reservations");
-//     return response.data.map((reservation: any) => ({
-//       groupId: reservation.groupId,
-//       groupName: reservation.groupName,
-//       reservationDate: reservation.date,
-//       members: reservation.members.map((member: any) => ({
-//         id: member.id,
-//         name: `${member.firstName} ${member.lastName}`,
-//       })),
-//     }));
-//   } catch (error) {
-//     console.error("Erreur lors de la récupération des réservations :", error);
-//     throw error;
-//   }
-// };

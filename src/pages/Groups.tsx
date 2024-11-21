@@ -7,9 +7,25 @@ interface Group {
   id: number;
   name: string;
   description: string;
-  imageUrl: string;
-  members: { name: string; instrument: string }[];
-  genres: string[];
+  createdAt: string;
+  userGroups: {
+    id: number;
+    user: { id: number; firstName: string; lastName: string; email: string };
+  }[];
+  groupInstruments: {
+    id: number;
+    instrument: { id: number; instrument: string };
+  }[];
+  groupGenres: { id: number; genre: { id: number; genre: string } }[];
+  reservations: {
+    id: number;
+    groupId: number;
+    userId: number;
+    addressId: number;
+    date: string;
+    duration: number;
+    status: string;
+  }[];
 }
 
 const Groups: React.FC = () => {
@@ -23,19 +39,9 @@ const Groups: React.FC = () => {
       setIsLoading(true);
       fetchGroupById(id)
         .then((data) => {
-          setGroup({
-            id: data.id,
-            name: data.name,
-            description: data.description,
-            imageUrl: data.imageUrl || "https://via.placeholder.com/150",
-            members: data.userGroups.map((ug: any) => ({
-              name: `User ${ug.userId}`,
-              instrument: `Instrument ID ${ug.groupId}`,
-            })),
-            genres: data.groupGenres.map((gg: any) => `Genre ${gg.genre}`),
-          });
+          setGroup(data);
         })
-        .catch((err) =>
+        .catch(() =>
           setError("Erreur lors du chargement des détails du groupe.")
         )
         .finally(() => setIsLoading(false));
@@ -59,47 +65,93 @@ const Groups: React.FC = () => {
   return (
     <div className="container mx-auto px-4 py-8">
       <div className="flex flex-col items-center bg-white p-6 rounded-lg shadow-lg">
-        {/* Image du groupe */}
-        <img
-          src={group.imageUrl}
-          alt={group.name}
-          className="w-48 h-48 object-cover rounded-full mb-4"
-        />
-        {/* Nom et description */}
         <h1 className="text-3xl font-bold text-gray-800 mb-2">{group.name}</h1>
         <p className="text-lg text-gray-600 mb-6 text-center">
           {group.description}
         </p>
+        <p className="text-sm text-gray-500 mb-4">
+          Créé le : {new Date(group.createdAt).toLocaleDateString()}
+        </p>
 
-        {/* Genres */}
-        <div className="flex flex-wrap gap-2 mb-6">
-          {group.genres.map((genre, index) => (
-            <Badge
-              key={index}
-              text={genre}
-              color="bg-blue-500 hover:bg-blue-600"
-              onClick={() => {}}
-            />
-          ))}
+        <div className="mb-6 w-full text-center">
+          <h2 className="text-2xl font-semibold text-gray-700 mb-4">
+            Genres associés
+          </h2>
+          <div className="flex flex-wrap gap-2 justify-center">
+            {group.groupGenres.map((gg) => (
+              <Badge
+                key={gg.id}
+                text={gg.genre.genre}
+                color="bg-blue-500 hover:bg-blue-600 text-white"
+                onClick={() => {}}
+              />
+            ))}
+          </div>
         </div>
 
-        {/* Membres */}
-        <h2 className="text-2xl font-semibold text-gray-700 mb-4">
-          Membres du groupe
-        </h2>
-        <ul className="w-full max-w-md space-y-4">
-          {group.members.map((member, index) => (
-            <li
-              key={index}
-              className="flex justify-between items-center bg-gray-100 p-4 rounded-lg shadow-sm"
-            >
-              <span className="text-lg font-medium text-gray-800">
-                {member.name}
-              </span>
-              <span className="text-sm text-gray-600">{member.instrument}</span>
-            </li>
-          ))}
-        </ul>
+        <div className="mb-6 w-full text-center">
+          <h2 className="text-2xl font-semibold text-gray-700 mb-4">
+            Instruments joués
+          </h2>
+          <div className="flex flex-wrap gap-2 justify-center">
+            {group.groupInstruments.map((gi) => (
+              <Badge
+                key={gi.id}
+                text={gi.instrument.instrument}
+                color="bg-green-500 hover:bg-green-600 text-white"
+                onClick={() => {}}
+              />
+            ))}
+          </div>
+        </div>
+
+        <div className="mb-6 w-full text-center">
+          <h2 className="text-2xl font-semibold text-gray-700 mb-4">
+            Membres du groupe
+          </h2>
+          <ul className="w-full max-w-md space-y-4 mx-auto">
+            {group.userGroups.map((ug) => (
+              <li
+                key={ug.id}
+                className="flex flex-col md:flex-row justify-between items-start md:items-center bg-gray-100 p-4 rounded-lg shadow-sm"
+              >
+                <span className="text-lg font-medium text-gray-800">
+                  {ug.user.firstName} {ug.user.lastName}
+                </span>
+                <span className="text-sm text-gray-600">{ug.user.email}</span>
+              </li>
+            ))}
+          </ul>
+        </div>
+
+        {/* Section pour afficher les réservations */}
+        <div className="mb-6 w-full text-center">
+          <h2 className="text-2xl font-semibold text-gray-700 mb-4">
+            Réservations
+          </h2>
+          <div className="w-full max-w-md space-y-4 mx-auto">
+            {group.reservations.length === 0 ? (
+              <p>Aucune réservation pour ce groupe.</p>
+            ) : (
+              group.reservations.map((reservation) => (
+                <div
+                  key={reservation.id}
+                  className="flex flex-col md:flex-row justify-between items-start md:items-center bg-gray-100 p-4 rounded-lg shadow-sm"
+                >
+                  <span className="text-lg font-medium text-gray-800">
+                    {new Date(reservation.date).toLocaleString()}
+                  </span>
+                  <span className="text-sm text-gray-600">
+                    Durée : {reservation.duration} heure(s)
+                  </span>
+                  <span className="text-sm text-gray-600">
+                    Statut : {reservation.status}
+                  </span>
+                </div>
+              ))
+            )}
+          </div>
+        </div>
       </div>
     </div>
   );

@@ -37,25 +37,23 @@ const Navbar: React.FC = () => {
   return (
     <nav className="flex items-center justify-between bg-gray-800 p-4 shadow-md">
       <div className="text-white text-2xl font-bold">
-        <Link to="/">
-          <img src="MuzakLogo.png" alt="Muzak Logo" className="h-14 " />
-        </Link>
+        <img src="MuzakLogo.png" alt="Muzak Logo" className="h-14"/>
       </div>
 
       <div className="hidden md:flex space-x-6">
-        <Link to="/">
-          <button className="text-white hover:bg-gray-700 px-3 py-2 rounded">
-            Home
-          </button>
-        </Link>
         <Link to="/groups">
           <button className="text-white hover:bg-gray-700 px-3 py-2 rounded">
-            Groups
+            Groupes
           </button>
         </Link>
         <Link to="/reservations">
           <button className="text-white hover:bg-gray-700 px-3 py-2 rounded">
-            Reservations
+            Réservations
+          </button>
+        </Link>
+        <Link to="/address">
+          <button className="text-white hover:bg-gray-700 px-3 py-2 rounded">
+            Adresses
           </button>
         </Link>
         {firstName ? (
@@ -71,13 +69,13 @@ const Navbar: React.FC = () => {
               onClick={handleLogout}
               className="text-white hover:bg-red-600 px-3 py-2 rounded bg-red-500"
             >
-              Logout
+              Se déconnecter
             </button>
           </div>
         ) : (
           <Link to="/login">
             <button className="text-white hover:bg-gray-700 px-3 py-2 rounded">
-              Login
+              Se connecter
             </button>
           </Link>
         )}
@@ -94,18 +92,10 @@ const Navbar: React.FC = () => {
           <DropdownMenu.Content className="bg-gray-800 text-white rounded-md shadow-lg p-2">
             <DropdownMenu.Item>
               <Link
-                to="/"
-                className="block px-4 py-2 hover:bg-gray-700 rounded"
-              >
-                Home
-              </Link>
-            </DropdownMenu.Item>
-            <DropdownMenu.Item>
-              <Link
                 to="/groups"
                 className="block px-4 py-2 hover:bg-gray-700 rounded"
               >
-                Groups
+                Groupes
               </Link>
             </DropdownMenu.Item>
             <DropdownMenu.Item>
@@ -113,22 +103,24 @@ const Navbar: React.FC = () => {
                 to="/reservations"
                 className="block px-4 py-2 hover:bg-gray-700 rounded"
               >
-                Reservations
+                Réservations
+              </Link>
+            </DropdownMenu.Item>
+            <DropdownMenu.Item>
+              <Link to="/address">
+                <button className="text-white hover:bg-gray-700 px-3 py-2 rounded">
+                  Adresses
+                </button>
               </Link>
             </DropdownMenu.Item>
             {firstName ? (
               <>
                 <DropdownMenu.Item>
-                  <span className="block px-4 py-2 rounded">
-                    Bienvenue, {firstName}
-                  </span>
-                </DropdownMenu.Item>
-                <DropdownMenu.Item>
-                  <Link
-                    to="/profile"
-                    className="block w-full text-left px-4 py-2 hover:bg-gray-700 rounded"
-                  >
-                    Profil
+                  <Link to="/profile">
+                    <button className="flex items-center text-white hover:bg-gray-700 px-3 py-2 rounded">
+                      <FaceIcon className="mr-2" />
+                      {firstName}
+                    </button>
                   </Link>
                 </DropdownMenu.Item>
                 <DropdownMenu.Item>
@@ -136,7 +128,7 @@ const Navbar: React.FC = () => {
                     onClick={handleLogout}
                     className="block w-full text-left px-4 py-2 hover:bg-red-600 rounded bg-red-500"
                   >
-                    Logout
+                    Se déconnecter
                   </button>
                 </DropdownMenu.Item>
               </>
@@ -146,7 +138,7 @@ const Navbar: React.FC = () => {
                   to="/login"
                   className="block px-4 py-2 hover:bg-gray-700 rounded"
                 >
-                  Login
+                  Se connecter
                 </Link>
               </DropdownMenu.Item>
             )}

@@ -2,7 +2,7 @@ import React, { useState, useEffect } from "react";
 import { Link } from "react-router-dom";
 import { ChevronUpIcon, ChevronDownIcon } from "@radix-ui/react-icons";
 import { fetchGroupDetails } from "../apiService";
-import Badge from "./Badge"; // Assurez-vous que le composant Badge est bien importé
+import Badge from "./Badge";
 
 interface GroupInstrument {
   instrumentId: number;
@@ -55,13 +55,15 @@ const GroupsList: React.FC = () => {
   const [sortOrder, setSortOrder] = useState<"name" | "createdAt">("name");
   const [ascending, setAscending] = useState<boolean>(true);
 
-  const [filteredInstruments, setFilteredInstruments] = useState<FilteredInstrument[]>([]);
+  const [filteredInstruments, setFilteredInstruments] = useState<
+    FilteredInstrument[]
+  >([]);
   const [selectedInstruments, setSelectedInstruments] = useState<number[]>([]);
 
   const [filteredGenres, setFilteredGenres] = useState<FilteredGenre[]>([]);
   const [selectedGenres, setSelectedGenres] = useState<number[]>([]);
 
-  const [searchQuery, setSearchQuery] = useState<string>(""); // État pour la barre de recherche
+  const [searchQuery, setSearchQuery] = useState<string>("");
 
   useEffect(() => {
     const getGroups = async () => {
@@ -76,55 +78,71 @@ const GroupsList: React.FC = () => {
     getGroups();
   }, []);
 
-  // Mettre à jour les données filtrées (instruments et genres)
   const updateFilteredData = (filteredGroups: Group[]) => {
-    const instrumentCounts = filteredGroups.reduce((counts, group) => {
-      group.groupInstruments.forEach((gi) => {
-        counts[gi.instrument.id] = (counts[gi.instrument.id] || 0) + 1;
-      });
-      return counts;
-    }, {} as Record<number, number>);
-
-    const updatedInstruments = filteredGroups.flatMap((group) =>
-      group.groupInstruments.map((gi) => ({
-        id: gi.instrument.id,
-        instrument: gi.instrument.instrument,
-        count: instrumentCounts[gi.instrument.id] || 0,
-      }))
-    );
-
     const uniqueInstruments = Array.from(
-      new Map(updatedInstruments.map((item) => [item.id, item])).values()
+      new Map(
+        filteredGroups
+          .flatMap((group) =>
+            group.groupInstruments
+              .filter((gi) => gi.instrument && gi.instrument.instrument)
+              .map((gi) => ({
+                id: gi.instrument.id,
+                instrument: gi.instrument.instrument,
+                count: filteredGroups.reduce(
+                  (count, g) =>
+                    count +
+                    g.groupInstruments.filter(
+                      (item) =>
+                        item.instrument &&
+                        item.instrument.id === gi.instrument.id
+                    ).length,
+                  0
+                ),
+              }))
+          )
+          .map((item) => [item.id, item])
+      ).values()
+    ).filter((item) => item.instrument);
+
+    uniqueInstruments.sort((a, b) =>
+      (a.instrument || "").localeCompare(b.instrument || "")
     );
 
     setFilteredInstruments(uniqueInstruments);
 
-    const genreCounts = filteredGroups.reduce((counts, group) => {
-      group.groupGenres.forEach((genre) => {
-        counts[genre.genre.id] = (counts[genre.genre.id] || 0) + 1;
-      });
-      return counts;
-    }, {} as Record<number, number>);
-
-    const updatedGenres = filteredGroups.flatMap((group) =>
-      group.groupGenres.map((genre) => ({
-        id: genre.genre.id,
-        genre: genre.genre.genre,
-        count: genreCounts[genre.genre.id] || 0,
-      }))
-    );
-
     const uniqueGenres = Array.from(
-      new Map(updatedGenres.map((item) => [item.id, item])).values()
-    );
+      new Map(
+        filteredGroups
+          .flatMap((group) =>
+            group.groupGenres
+              .filter((gg) => gg.genre && gg.genre.genre) 
+              .map((gg) => ({
+                id: gg.genre.id,
+                genre: gg.genre.genre,
+                count: filteredGroups.reduce(
+                  (count, g) =>
+                    count +
+                    g.groupGenres.filter(
+                      (item) => item.genre && item.genre.id === gg.genre.id
+                    ).length,
+                  0
+                ),
+              }))
+          )
+          .map((item) => [item.id, item])
+      ).values()
+    ).filter((item) => item.genre); 
+
+    uniqueGenres.sort((a, b) => (a.genre || "").localeCompare(b.genre || ""));
 
     setFilteredGenres(uniqueGenres);
   };
 
-  // Filtrer les groupes
   const filteredGroups = groups.filter((group) => {
     if (selectedInstruments.length > 0) {
-      const groupInstrumentIds = group.groupInstruments.map((gi) => gi.instrument.id);
+      const groupInstrumentIds = group.groupInstruments.map(
+        (gi) => gi.instrument.id
+      );
       if (!selectedInstruments.every((id) => groupInstrumentIds.includes(id))) {
         return false;
       }
@@ -174,13 +192,17 @@ const GroupsList: React.FC = () => {
 
   const handleInstrumentFilterChange = (instrumentId: number) => {
     setSelectedInstruments((prev) =>
-      prev.includes(instrumentId) ? prev.filter((id) => id !== instrumentId) : [...prev, instrumentId]
+      prev.includes(instrumentId)
+        ? prev.filter((id) => id !== instrumentId)
+        : [...prev, instrumentId]
     );
   };
 
   const handleGenreFilterChange = (genreId: number) => {
     setSelectedGenres((prev) =>
-      prev.includes(genreId) ? prev.filter((id) => id !== genreId) : [...prev, genreId]
+      prev.includes(genreId)
+        ? prev.filter((id) => id !== genreId)
+        : [...prev, genreId]
     );
   };
 
@@ -284,7 +306,9 @@ const GroupsList: React.FC = () => {
               {group.userGroups
                 .map(
                   (userGroup) =>
-                    `${userGroup.user.firstName.toUpperCase()} ${userGroup.user.lastName}`
+                    `${userGroup.user.firstName.toUpperCase()} ${
+                      userGroup.user.lastName
+                    }`
                 )
                 .join(", ")}
             </p>
