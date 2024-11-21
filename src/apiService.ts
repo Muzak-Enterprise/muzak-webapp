@@ -53,7 +53,7 @@ export const registerUser = async (
     if (response.data.token) {
       localStorage.setItem("authToken", response.data.token);
     }
-    return response.data; 
+    return response.data;
   } catch (error) {
     console.error("Erreur lors de l'inscription :", error);
     throw error;
@@ -93,7 +93,7 @@ export const fetchGenres = async () => {
 export const fetchGroupDetails = async () => {
   try {
     const response = await apiClient.get(`/v1/groups`);
-    return response.data; 
+    return response.data;
   } catch (error) {
     console.error("Erreur lors de la récupération des détails du groupe :", error);
     throw error;
@@ -174,5 +174,15 @@ export const createReservation = async (reservation: any) => {
     throw error;
   }
 };
+
+export const updateUserGroups = async (userId: number, groupId: number) => {
+  try {
+    const response = await apiClient.post("/v1/user-groups");
+    return response.data;
+  } catch (error) {
+    console.error("Erreur lors de la récupération des groupes de l'utilisateur :", error);
+    throw error;
+  }
+}
 
 export default apiClient;

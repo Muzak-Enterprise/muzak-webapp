@@ -40,7 +40,8 @@ const Profile: React.FC = () => {
           firstName: userData.firstName,
           lastName: userData.lastName,
           email: userData.email,
-          profileImageUrl: userData.profileImageUrl || "https://via.placeholder.com/150",
+          profileImageUrl:
+            userData.profileImageUrl || "https://via.placeholder.com/150",
           userGroups: userData.userGroups,
           reservations: userData.reservations,
         });
@@ -55,7 +56,9 @@ const Profile: React.FC = () => {
       .then((groupDetails) => {
         setGroups(groupDetails);
       })
-      .catch(() => setError("Erreur lors du chargement des données utilisateur."))
+      .catch(() =>
+        setError("Erreur lors du chargement des données utilisateur.")
+      )
       .finally(() => setIsLoading(false));
   }, []);
 
@@ -90,7 +93,9 @@ const Profile: React.FC = () => {
   };
 
   if (isLoading) {
-    return <div className="text-center text-xl font-semibold">Chargement...</div>;
+    return (
+      <div className="text-center text-xl font-semibold">Chargement...</div>
+    );
   }
 
   if (error) {
@@ -98,7 +103,11 @@ const Profile: React.FC = () => {
   }
 
   if (!user) {
-    return <div className="text-center text-gray-500">Profil utilisateur introuvable</div>;
+    return (
+      <div className="text-center text-gray-500">
+        Profil utilisateur introuvable
+      </div>
+    );
   }
 
   return (
@@ -192,30 +201,44 @@ const Profile: React.FC = () => {
                   className="bg-white p-4 rounded-lg shadow-md hover:shadow-xl cursor-pointer transition-transform transform hover:scale-105"
                   onClick={() => handleGroupClick(group.id)}
                 >
-                  <h4 className="text-lg font-semibold text-gray-800">{group.name}</h4>
+                  <h4 className="text-lg font-semibold text-gray-800">
+                    {group.name}
+                  </h4>
                   <ul className="mt-2 text-sm text-gray-600">
-                    {group.members?.map((member: { id: number; name: string }) => (
-                      <li key={member.id}>{member.name}</li>
-                    ))}
+                    {group.members?.map(
+                      (member: { id: number; name: string }) => (
+                        <li key={member.id}>{member.name}</li>
+                      )
+                    )}
                   </ul>
                 </div>
               ))
             ) : (
-              <p className="text-gray-500">Vous n'êtes membre d'aucun groupe.</p>
+              <p className="text-gray-500">
+                Vous n'êtes membre d'aucun groupe.
+              </p>
             )}
           </div>
         </div>
 
         <div className="bg-white p-6 rounded-lg shadow-lg">
-          <h3 className="text-xl font-semibold text-gray-700">Réservations :</h3>
-          <ul className="mt-4 space-y-2">
-            {user.reservations.map((reservation) => (
-              <li key={reservation.id} className="text-gray-800">
-                Réservation pour le groupe {reservation.groupId} à la date{" "}
-                {new Date(reservation.date).toLocaleDateString()}
-              </li>
-            ))}
-          </ul>
+          <h3 className="text-xl font-semibold text-gray-700">
+            Réservations :
+          </h3>
+          {user.reservations.length > 0 ? (
+            <ul className="mt-4 space-y-2">
+              {user.reservations.map((reservation) => (
+                <li key={reservation.id} className="text-gray-800">
+                  Réservation pour le groupe {reservation.groupId} à la date du {" "}
+                  {new Date(reservation.date).toLocaleDateString()}
+                </li>
+              ))}
+            </ul>
+          ) : (
+            <p className="mt-4 text-gray-500">
+              Vous n'avez pas encore fait de réservation.
+            </p>
+          )}
         </div>
       </div>
     </div>

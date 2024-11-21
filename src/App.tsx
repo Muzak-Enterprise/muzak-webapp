@@ -3,13 +3,13 @@ import { Route, Routes, useLocation } from "react-router-dom";
 import Navbar from "./components/Navbar";
 import PrivateRoute from "./components/PrivateRoute";
 import Adress from "./pages/Address";
-import GroupsList from "./components/GroupsList";
+import GroupsList from "./pages/GroupsList";
 import Groups from "./pages/Groups";
 import Profile from "./pages/Profile";
 import Reservations from "./pages/Reservations";
 import LoginRegister from "./pages/LoginRegister";
 import EasterEgg from "./EasterEgg";
-import NotFound from "./pages/NotFound"; // Page d'erreur 404
+import NotFound from "./pages/NotFound";
 
 const App: React.FC = () => {
   const location = useLocation();
