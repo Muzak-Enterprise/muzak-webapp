@@ -1,6 +1,6 @@
 import axios from "axios";
 
-const API_BASE_URL = "http://localhost:3002/api";
+const API_BASE_URL = process.env.API_URL ? `${process.env.API_URL}/api` : "http://localhost:3000/api";
 
 const apiClient = axios.create({
   baseURL: API_BASE_URL,
@@ -138,7 +138,7 @@ export const updateUser = async (userId: number, updatedData: any) => {
     }
 
     const data = await response.json();
-    return data; // Retourne les données mises à jour de l'utilisateur
+    return data;
   } catch (error) {
     console.error("Erreur de mise à jour utilisateur", error);
   }

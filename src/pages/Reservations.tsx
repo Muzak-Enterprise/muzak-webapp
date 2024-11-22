@@ -4,8 +4,8 @@ import { createReservation, fetchAddresses, fetchGroupDetails } from "../apiServ
 const Reservations: React.FC = () => {
   const [addresses, setAddresses] = useState<any[]>([]);
   const [groups, setGroups] = useState<any[]>([]);
-  const [groupId, setGroupId] = useState<number | string>("");  // Initialisation comme string pour la gestion des valeurs vides
-  const [addressId, setAddressId] = useState<number | string>("");  // Initialisation comme string pour la gestion des valeurs vides
+  const [groupId, setGroupId] = useState<number | string>("");  
+  const [addressId, setAddressId] = useState<number | string>("");  
   const [date, setDate] = useState<string>("");
   const [duration, setDuration] = useState<number>(1);
   const [error, setError] = useState<string | null>(null);

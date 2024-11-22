@@ -457,15 +457,6 @@ const TabsDemo: React.FC = () => {
           </div>
         </Tabs.Root>
       </div>
-      {/* <div className="absolute top-4 left-4 flex items-center space-x-2">
-        <button
-          onClick={() => (window.location.href = "/login")}
-          className="flex items-center p-2 bg-blue-600 text-white rounded-md shadow-md hover:bg-blue-700"
-        >
-          <HomeIcon width="20px" height="20px" className="mr-2" />
-          <span className="text-lg">Revenir à la page d'accueil</span>
-        </button>
-      </div> */}
     </div>
   );
 };

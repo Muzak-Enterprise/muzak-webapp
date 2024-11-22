@@ -125,7 +125,6 @@ const Groups: React.FC = () => {
           </ul>
         </div>
 
-        {/* Section pour afficher les réservations */}
         <div className="mb-6 w-full text-center">
           <h2 className="text-2xl font-semibold text-gray-700 mb-4">
             Réservations
