@@ -3,3 +3,5 @@ Lancer le projet :
 * cloner le projet
 * npm install --f
 * npm start
+
+Ouvrir le localhost:3000
